@@ -22,10 +22,11 @@ let hotMiddleware = webpackHotMiddleware(compiler,{
 let devMiddleware =webpackDevMiddleware(compiler, {
     publicPath: config.output.publicPath,
     //向控制台显示任何内容
-    quiet: true,
+    logLevel:"info",
     stats: {
         colors: true,
     }
+
 });
 app.use(devMiddleware);
 app.use(hotMiddleware);

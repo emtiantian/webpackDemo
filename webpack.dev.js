@@ -5,12 +5,12 @@ const path = require("path");
 //清空dist目录
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ROOT_PATH = path.resolve(__dirname);
-const APP_PATH = path.resolve(ROOT_PATH, './src');
 const BUILD_PATH = path.resolve(ROOT_PATH, './dist');
+// const  entrys = common.entry.concat(["webpack-hot-middleware/client?&timeout=20000&reload=true"]);
 module.exports = merge(common, {
     mode :"development",
-    //实现刷新浏览器webpack-hot-middleware/client?noInfo=true&reload=true 是必填的 现在在sever.js中设置
-    entry: [ "webpack-hot-middleware/client?&timeout=20000&reload=true",APP_PATH],
+    //实现刷新浏览器webpack-hot-middleware/client?noInfo=true&reload=true 是必填的 现在在sever.js中设置没起作用
+    // entry:  entrys,
     devtool: 'inline-source-map',
     output:{
         path:path.resolve(BUILD_PATH),
