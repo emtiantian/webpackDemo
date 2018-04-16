@@ -30,7 +30,6 @@ const entries= function () {
     return map;
 }
 let  entrys = entries();
-console.log(entrys);
 module.exports={
 
     entry:entrys ,
@@ -61,15 +60,34 @@ module.exports={
                         },
                         {
                             loader:'less-loader',
-                        },
+                        }
                     ],
                     // fallback: 'style-loader',
                 })
+            },{
+                test:/\.(png|jpg|gif|ttf|eot|woff|woff2|svg|swf)$/,
+                use: [
+                    {
+                        loader: 'url-loader',
+                        options: {
+                            limit: 1024*5,
+                            publicPath: 'assets/images/',
+                            outputPath:'assets/images/',//定义输出的图片文件夹
+                            name: '[name].[hash].[ext]'
+
+                        },
+
+                    }
+                ]
+            },{
+                test:/\.(html|htm)$/,
+                use:'html-withimg-loader'
             }
         ]
     },
     resolve: {
-        extensions: ['.less']
+        //解析less 不需要后缀
+        extensions: ['.less',".png",".jpg",".svg","gif"]
     },
     plugins:[
 

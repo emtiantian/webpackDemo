@@ -7,6 +7,7 @@
   const common = require('./webpack.common.js');
   const ROOT_PATH = path.resolve(__dirname);
   const BUILD_PATH = path.resolve(ROOT_PATH, 'prod');
+
       module.exports = merge(common, {
           mode :"production",
           output:{
