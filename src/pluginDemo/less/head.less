@@ -1,5 +1,20 @@
 
-@timeImg:"./assets/1.png";
-.time{
-  //background-image: url("@{timeImg}") no-repeat;
+//@timeImg: _SRC+'/pluginDemo/assets/1.png';
+@timeImg :"../assets/2.png";
+@linkImg :"../assets/sory.svg";
+@fontWith: 14px;
+.time1 {
+  background-image: url("../assets/1.png");
+}
+.link{
+  background-image: url(@linkImg);
+  width: @fontWith*4;
+  height: @fontWith*2;
+}
+body{
+    background: url(@timeImg) no-repeat center center fixed;
+    //-webkit-background-size: cover;
+    //-moz-background-size: cover;
+    //-o-background-size: cover;
+    background-size: cover;
 }

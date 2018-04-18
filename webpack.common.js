@@ -5,7 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 //生成单独文件
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 //删除css
-const CleanCSSPlugin = require('less-plugin-clean-css');
+// const CleanCSSPlugin = require('less-plugin-clean-css');
 //lodash 模块化加载
 //LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const ROOT_PATH = path.resolve(__dirname);
@@ -13,31 +13,62 @@ const ROOT_PATH = path.resolve(__dirname);
 const glob = require('glob');
 
 //entries函数
-const entries= function () {
+//获取全部的入口js
+const entries = function () {
     let jsDir = path.resolve(ROOT_PATH, 'src');
-    let entryFiles = glob.sync(jsDir + '/*/*.js');
+    let entryFiles = glob.sync(jsDir + '/*/index.js');
     let map = {};
 
     for (let i = 0; i < entryFiles.length; i++) {
         let filePath = entryFiles[i];
-        let filename = filePath.substring(filePath.lastIndexOf('\/') + 1, filePath.lastIndexOf('.'));
-        if(process.env.NODE_ENV === "development"){
-            map[filename]=["webpack-hot-middleware/client?noInfo=true&reload=true",filePath];
-        }
-        map[filename]=filePath;
+        // let filename = filePath.substring(filePath.lastIndexOf('\/') + 1, filePath.lastIndexOf('.'));
+        let namearr = filePath.split("/");
+        let pluginName =namearr[namearr.length-2];
+        map[pluginName] = filePath;
     }
 
     return map;
 }
-let  entrys = entries();
-module.exports={
+const htmljs = function () {
+    let htmljsDir = path.resolve(ROOT_PATH, 'src');
+    let entryFiles = glob.sync(htmljsDir + '/*/html/html.js');
+    let arr = [];
+    for (let i = 0; i < entryFiles.length; i++) {
+        let filePath = entryFiles[i];
+        // let filename = filePath.substring(filePath.lastIndexOf('\/') + 1, filePath.lastIndexOf('.'))
+        // let pluginName = filePath.substring(filePath.lastIndexOf('\/') + 1, filePath.lastIndexOf('\/'));
+        let namearr = filePath.split("/");
+        let pluginName =namearr[namearr.length-3];
+        let htmlPlugin = new HtmlWebpackPlugin({
+            filename: "index.html",
+            template: filePath,
+            //只引用当前包和common中的资源文件
+            chunks: [pluginName],
+            hash: true, // 为静态资源生成hassh值
+            chunksSortMode: 'manual',//将chunks按引入的顺序排序
+            inject  : true,//所有JavaScript资源插入到body元素的底部
+            minify: {
+                removeAttributeQuotes: true//压缩 去掉引号
+            },
+            xhtml: true,
+        });
+        arr.push(htmlPlugin);
+    }
+    return arr;
+};
+let entrys = entries();
+console.dir(entrys);
+//获取全部的模板js
+let entrysHtmlJs = htmljs();
+console.dir(entrysHtmlJs[0].options.chunks);
 
-    entry:entrys ,
-    output:{
-        filename:"[name]_[hash].js",
-        publicPath: '/'
+module.exports = {
+    entry: entrys,
+    output: {
+        filename: "./[name]_[hash].js",
+        publicPath: '/',
     },
-    module:{
+    module: {
         rules: [
             {
                 test: /\.js$/,
@@ -46,60 +77,73 @@ module.exports={
                 query: {
                     presets: ['env']
                 }
-            },{
-                test: /\.less$/,
-                use: ExtractTextPlugin.extract({
-                    use:[
-                        {
-                            loader: 'css-loader',
-                            options:{
-                                modules:true,
-                                importLoaders:1,
-                                localIdentName:'[local]',
-                            }
-                        },
-                        {
-                            loader:'less-loader',
-                        }
-                    ],
-                    // fallback: 'style-loader',
-                })
-            },{
-                test:/\.(png|jpg|gif|ttf|eot|woff|woff2|svg|swf)$/,
+            },
+            {
+                test: /\.(png|jpg|gif|ttf|eot|woff|woff2|svg|swf)$/,
                 use: [
                     {
                         loader: 'url-loader',
                         options: {
-                            limit: 1024*5,
-                            publicPath: 'assets/images/',
-                            outputPath:'assets/images/',//定义输出的图片文件夹
-                            name: '[name].[hash].[ext]'
+                            limit: 1024 * 5,
+                            outputPath: 'assets/images/',//定义输出的图片文件夹
+                            name: '[name]_[hash].[ext]'
 
                         },
 
                     }
                 ]
+            }, {
+                test: /\.css$/,
+                loader: ExtractTextPlugin.extract({
+                    fallback: "style-loader",
+                    use: "css-loader"
+                })
+            },
+            {
+                test: /\.less$/,
+                use: ExtractTextPlugin.extract({
+                    use: [
+                        {
+                            loader: 'css-loader',
+                            options: {
+                                modules: true,
+                                importLoaders: 0,
+                                localIdentName: '[local]',
+                            }
+                        },
+                        {
+                            loader: 'less-loader',
+                        }
+                    ],
+                })
+            },
+            {
+                //html中引用img
+                test: /\.(html|htm)$/,
+                use: 'html-withimg-loader'
             },{
-                test:/\.(html|htm)$/,
-                use:'html-withimg-loader'
+                test: /\.ejs$/,
+                use: "ejs-loader"
             }
         ]
     },
     resolve: {
         //解析less 不需要后缀
-        extensions: ['.less',".png",".jpg",".svg","gif"]
-    },
-    plugins:[
+        extensions: ['.less', ".png", ".jpg", ".svg", ".gif", ".js"],
 
-        new HtmlWebpackPlugin({
-            title: 'Output Management',
-            inject:"true"
-        }),
-        new ExtractTextPlugin('[name]_[hash].css'),
-    ],
-    // devServer: {
-    //     contentBase: './dist',
-    //     hot: true
-    // }
+    },
+    // plugins: [
+    //     new HtmlWebpackPlugin({
+    //         template: path.resolve(__dirname,'src/pluginDemo/html/','html.js'),//模板
+    //         filename:'index.ejs',
+    //         hash:true,//防止缓存
+    //         minify:{
+    //             removeAttributeQuotes:true//压缩 去掉引号
+    //         }
+    //     }),
+    //     new ExtractTextPlugin('[name]_[hash].css'),
+    // ],
+    plugins: entrysHtmlJs.concat(new ExtractTextPlugin('[name]_[hash].css'))
+
 
 };

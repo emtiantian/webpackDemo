@@ -4,16 +4,18 @@ const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require("webpack-Hot-middleware");
 const app = express();
 const config = require('../webpack.dev.js');
-const compiler = webpack(config);
+
+//设置‘webpack.dev.js’的入口配置，如果通过这种动态设置的方法，请一定注意webpack.dev.js里面入口的写法
+
+Object.keys(config.entry).forEach(function(key) {
+    config.entry[key] = ['webpack-hot-middleware/client?&timeout=20000&reload=true'].concat(config.entry[key]);
+});
+
+let compiler = webpack(config);
 const  open = require('opn');
 const  port = 3000;
 
 
-
-//设置‘webpack.dev.js’的入口配置，如果通过这种动态设置的方法，请一定注意webpack.dev.js里面入口的写法
-// Object.keys(config.entry).forEach(function(key) {
-//     config.entry[key] = ['webpack-hot-middleware/client?&timeout=20000&reload=true'].concat(config.entry[key]);
-// })
 
 let hotMiddleware = webpackHotMiddleware(compiler,{
     log: console.log,
