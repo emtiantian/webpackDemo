@@ -10,11 +10,15 @@
   background-image: url(@linkImg);
   width: @fontWith*4;
   height: @fontWith*2;
+  border-radius: 5px;
 }
 body{
+  display: flex;
     background: url(@timeImg) no-repeat center center fixed;
-    //-webkit-background-size: cover;
-    //-moz-background-size: cover;
-    //-o-background-size: cover;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
     background-size: cover;
+    //transform: rotate(30deg);
+  transition :transform 1s;
 }

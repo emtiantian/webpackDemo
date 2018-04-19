@@ -4,8 +4,7 @@ const path = require("path");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 //生成单独文件
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
-//删除css
-// const CleanCSSPlugin = require('less-plugin-clean-css');
+
 //lodash 模块化加载
 //LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const ROOT_PATH = path.resolve(__dirname);
@@ -92,11 +91,12 @@ module.exports = {
 
                     }
                 ]
-            }, {
+            },
+            {
                 test: /\.css$/,
                 loader: ExtractTextPlugin.extract({
-                    fallback: "style-loader",
-                    use: "css-loader"
+                    // fallback: "style-loader",
+                    use: ["css-loader","postcss-loader"]
                 })
             },
             {
@@ -112,8 +112,11 @@ module.exports = {
                             }
                         },
                         {
+                            loader: 'postcss-loader'
+                        },
+                        {
                             loader: 'less-loader',
-                        }
+                        },
                     ],
                 })
             },

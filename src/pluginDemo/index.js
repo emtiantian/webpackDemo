@@ -7,7 +7,7 @@ function component() {
 
     // Lodash, now imported by this script
     element.innerHTML = "webpack 自动部署 热启动成功啦!";
-    element.classList.add("time1");
+    element.classList.add("example");
     return element;
 }
 
