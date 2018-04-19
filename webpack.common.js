@@ -3,7 +3,7 @@ const path = require("path");
 //修改html
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 //生成单独文件
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 //lodash 模块化加载
 //LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
@@ -22,10 +22,9 @@ const entries = function () {
         let filePath = entryFiles[i];
         // let filename = filePath.substring(filePath.lastIndexOf('\/') + 1, filePath.lastIndexOf('.'));
         let namearr = filePath.split("/");
-        let pluginName =namearr[namearr.length-2];
+        let pluginName = namearr[namearr.length - 2];
         map[pluginName] = filePath;
     }
-
     return map;
 }
 const htmljs = function () {
@@ -37,7 +36,7 @@ const htmljs = function () {
         // let filename = filePath.substring(filePath.lastIndexOf('\/') + 1, filePath.lastIndexOf('.'))
         // let pluginName = filePath.substring(filePath.lastIndexOf('\/') + 1, filePath.lastIndexOf('\/'));
         let namearr = filePath.split("/");
-        let pluginName =namearr[namearr.length-3];
+        let pluginName = namearr[namearr.length - 3];
         let htmlPlugin = new HtmlWebpackPlugin({
             filename: "index.html",
             template: filePath,
@@ -45,7 +44,7 @@ const htmljs = function () {
             chunks: [pluginName],
             hash: true, // 为静态资源生成hassh值
             chunksSortMode: 'manual',//将chunks按引入的顺序排序
-            inject  : true,//所有JavaScript资源插入到body元素的底部
+            inject: true,//所有JavaScript资源插入到body元素的底部
             minify: {
                 removeAttributeQuotes: true//压缩 去掉引号
             },
@@ -55,16 +54,35 @@ const htmljs = function () {
     }
     return arr;
 };
+//全部入口js文件
 let entrys = entries();
-console.dir(entrys);
-//获取全部的模板js
+// console.dir(entrys);
+//获取全部的入口模板文件
 let entrysHtmlJs = htmljs();
-console.dir(entrysHtmlJs[0].options.chunks);
+// console.dir(entrysHtmlJs[0].options.chunks);
+
+//公共代码打包到一起 下方过期了
+// let commonsChunkPlugin = new webpack.optimize.splitChunks({
+//     name: 'commons', // 这公共代码的chunk名为'commons'
+//     filename: '[name].bundle.js', // 生成后的文件名，虽说用了[name]，但实际上就是'commons.bundle.js'了
+//     minChunks: 4, // 设定要有4个chunk（即4个页面）加载的js模块才会被纳入公共代码。这数目自己考虑吧，我认为3-5比较合适。
+// });
+//
+// //第三方包单独打包
+// let publgins =  new webpack.optimize.splitChunks({
+//     name: "vendor",
+//     // filename: "vendor.js"
+//     // (给 chunk 一个不同的名字)
+//
+//     minChunks: Infinity,
+//     // (随着 entry chunk 越来越多，
+//     // 这个配置保证没其它的模块会打包进 vendor chunk)
+// })
 
 module.exports = {
-    entry: entrys,
+    entry: Object.assign(entrys, {vendor: ["jquery"]}),//第三方不参与编译和打包
     output: {
-        filename: "./[name]_[hash].js",
+        filename: "./[name]_[hash].min.js",
         publicPath: '/',
     },
     module: {
@@ -95,8 +113,7 @@ module.exports = {
             {
                 test: /\.css$/,
                 loader: ExtractTextPlugin.extract({
-                    // fallback: "style-loader",
-                    use: ["css-loader","postcss-loader"]
+                    use: ["css-loader", "postcss-loader"]
                 })
             },
             {
@@ -121,10 +138,6 @@ module.exports = {
                 })
             },
             {
-                //html中引用img
-                test: /\.(html|htm)$/,
-                use: 'html-withimg-loader'
-            },{
                 test: /\.ejs$/,
                 use: "ejs-loader"
             }
@@ -133,6 +146,9 @@ module.exports = {
     resolve: {
         //解析less 不需要后缀
         extensions: ['.less', ".png", ".jpg", ".svg", ".gif", ".js"],
+        // alias: {
+        //     juqery: require("jquery")
+        // }
 
     },
     // plugins: [
@@ -145,8 +161,29 @@ module.exports = {
     //         }
     //     }),
     //     new ExtractTextPlugin('[name]_[hash].css'),
-    // ],
-    plugins: entrysHtmlJs.concat(new ExtractTextPlugin('[name]_[hash].css'))
-
+    // ]
+    plugins: entrysHtmlJs.concat(new ExtractTextPlugin('[name]_[hash].css')),
+    optimization: {
+        // runtimeChunk: {
+        //      name: "common",
+        //     // name: 'commons', // 这公共代码的chunk名为'commons'
+        //     // filename: '[name].bundle.js', // 生成后的文件名，虽说用了[name]，但实际上就是'commons.bundle.js'了
+        //     // minChunks: 4, // 设定要有4个chunk（即4个页面）加载的js模块才会被纳入公共代码。这数目自己考虑吧，我认为3-5比较合适。
+        // },
+        splitChunks: {
+            cacheGroups: {
+                vendors: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: "vendor",
+                    chunks: "all"
+                },
+                commons: {
+                    name: "commons",
+                    chunks: "initial", //默认所有块都起作用
+                    minChunks: 3   // 设定要有3个chunk（即3个页面）加载的js模块才会被纳入公共代码。这数目自己考虑吧，我认为3-5比较合适。
+                }
+            }
+        }
+    }
 
 };
