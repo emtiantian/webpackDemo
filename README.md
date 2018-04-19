@@ -31,15 +31,15 @@ npm i
 ```
 开启本地开发模式
 ```npm
-npm server
+npm  run server
 ```
 打包部署
 ``` npm
-npm build //打包
+npm run build //生产模式打包
 部署要自定义脚本
 ```
-测试
+单元测试
 ```npm
-npm test
+npm run test
 ```
 
