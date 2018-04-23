@@ -15,16 +15,20 @@
 7. 多出口
     >多页面应用
 8. 单元测试
-    >单元测试框架，和自动测试
+    >单元测试框架，和自动测试gui，
+    https://juejin.im/post/5ad88ea16fb9a07abc29729a
+    
 9. 按需加载
-```
-参考：https://juejin.im/post/59bb37fa6fb9a00a554f89d2
-```
+    >参考：https://juejin.im/post/59bb37fa6fb9a00a554f89d2
+
 10. 模块分离 
     >添加了公共模块分离和第三方模块分开打包
 11. 现有问题
     >css 和 html 的修改没有自动刷新浏览器,html模板没有完全运用es6，
     雪碧图没有加入使用,单个组件打包命令
+12. 自动化文档生成
+    >http://www.cnblogs.com/zhh8077/p/4010991.html
+
 ## 使用方式
  初始化
 ``` npm
@@ -43,4 +47,11 @@ npm run build //生产模式打包
 ```npm
 npm run test
 ```
-
+自动生成文档
+```npm
+npm run createDoc
+```
+gui自动测试
+```npm
+npm run test gui
+```

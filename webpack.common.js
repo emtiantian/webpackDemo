@@ -5,6 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 //生成单独文件
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 
+const webpack = require("webpack");
 //lodash 模块化加载
 //LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const ROOT_PATH = path.resolve(__dirname);
@@ -162,7 +163,9 @@ module.exports = {
     //     }),
     //     new ExtractTextPlugin('[name]_[hash].css'),
     // ]
-    plugins: entrysHtmlJs.concat(new ExtractTextPlugin('[name]_[hash].css')),
+    plugins: entrysHtmlJs
+        .concat(new ExtractTextPlugin('[name]_[hash].css'))//导出单独的css文件
+        .concat( new webpack.ProvidePlugin({$:"jquery"})),//设置公共变量
     optimization: {
         // runtimeChunk: {
         //      name: "common",
