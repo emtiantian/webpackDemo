@@ -3,7 +3,7 @@ const path = require("path");
 //修改html
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 //生成单独文件
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const webpack = require("webpack");
 //lodash 模块化加载
@@ -27,7 +27,7 @@ const entries = function () {
         map[pluginName] = filePath;
     }
     return map;
-}
+};
 const htmljs = function () {
     let htmljsDir = path.resolve(ROOT_PATH, 'src');
     let entryFiles = glob.sync(htmljsDir + '/*/html/html.js');
@@ -42,7 +42,7 @@ const htmljs = function () {
             filename: "index.html",
             template: filePath,
             //只引用当前包和common中的资源文件
-            chunks: [pluginName],
+            chunks: [pluginName,"vendor","runtime"],
             hash: true, // 为静态资源生成hassh值
             chunksSortMode: 'manual',//将chunks按引入的顺序排序
             inject: true,//所有JavaScript资源插入到body元素的底部
@@ -81,9 +81,10 @@ let entrysHtmlJs = htmljs();
 // })
 
 module.exports = {
-    entry: Object.assign(entrys, {vendor: ["jquery"]}),//第三方不参与编译和打包
+    // entry: Object.assign(entrys, {vendor: ["jquery"]}),//第三方不参与编译和打包
+    entry:entrys,
     output: {
-        filename: "./[name]_[hash].min.js",
+        filename: "./assets/js/[name]_[hash].min.js",
         publicPath: '/',
     },
     module: {
@@ -165,14 +166,17 @@ module.exports = {
     // ]
     plugins: entrysHtmlJs
         .concat(new ExtractTextPlugin('[name]_[hash].css'))//导出单独的css文件
-        .concat( new webpack.ProvidePlugin({$:"jquery"})),//设置公共变量
+        .concat( new webpack.ProvidePlugin(
+            { $: 'jquery',
+            jQuery: 'jquery',
+            'window.jQuery': 'jquery',
+            'window.$': 'jquery',
+            })
+        ),//设置公共变量
     optimization: {
-        // runtimeChunk: {
-        //      name: "common",
-        //     // name: 'commons', // 这公共代码的chunk名为'commons'
-        //     // filename: '[name].bundle.js', // 生成后的文件名，虽说用了[name]，但实际上就是'commons.bundle.js'了
-        //     // minChunks: 4, // 设定要有4个chunk（即4个页面）加载的js模块才会被纳入公共代码。这数目自己考虑吧，我认为3-5比较合适。
-        // },
+        runtimeChunk: {
+             name: "runtime",
+        },
         splitChunks: {
             cacheGroups: {
                 vendors: {
@@ -182,6 +186,8 @@ module.exports = {
                 },
                 commons: {
                     name: "commons",
+                    maxInitialRequests: 5, // The default limit is too small to showcase the effect
+                    minSize: 0, // This is example is too small to create commons chunks
                     chunks: "initial", //默认所有块都起作用
                     minChunks: 3   // 设定要有3个chunk（即3个页面）加载的js模块才会被纳入公共代码。这数目自己考虑吧，我认为3-5比较合适。
                 }

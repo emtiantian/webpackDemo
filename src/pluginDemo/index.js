@@ -1,5 +1,7 @@
 import './less/common.less';
 import './less/head.css';
+// import $ from "jquery";
+
 
 
 function component() {
@@ -10,25 +12,25 @@ function component() {
     element.classList.add("example");
     return element;
 }
-
+// alert("1234");
 document.body.appendChild(component());
 let buttonLink = document.createElement("button");
     buttonLink.classList.add("link");
+    buttonLink.id = "qwe";
     buttonLink.innerText = "下载";
     document.body.appendChild(buttonLink);
 
 
+$(function () {
+    console.log($(".link").html());
+    document.getElementById("qwe").onclick  = function () {
+        alert("点击到了js");
+    };
+    $("#qwe").on("click",function () {
+        alert("点击到了jquery");
+    })
 
-function  reload() {
-    document.body.innerHTML ="";
-}
-//热模块更新
-if(module.hot){
-    // 模块自己就接收更新
-    module.hot.accept({
-        callback:function () {
-            //在触发更新的时候调用函数的reload方法
-            this.reload();
-        }
-    });
-}
+});
+
+
+

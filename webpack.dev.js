@@ -12,6 +12,7 @@ module.exports = merge(common, {
     //实现刷新浏览器webpack-hot-middleware/client?noInfo=true&reload=true 是必填的 现在在sever.js中设置没起作用
     // entry:  entrys,
     devtool: 'inline-source-map',
+    // devtool :"cheap-source-map'",//这个在chrome中可以断点调试
     output:{
         path:path.resolve(BUILD_PATH),
     },
